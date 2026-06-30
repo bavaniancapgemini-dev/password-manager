@@ -1,13 +1,29 @@
+from security import *
 def show_passwords(passwords):
 
-    print("\n---- SAVED PASSWORDS ----")
+    for data in passwords:
 
-    if len(passwords) == 0:
+        parts = data.split("|")
 
-        print("No passwords saved")
+        encrypted_password = (
+            parts[2]
+            .replace(
+                " Password: ",
+                ""
+            )
+            .strip()
+        )
 
-    else:
+        decrypted = decrypt_password(
+            encrypted_password
+        )
 
-        for item in passwords:
+        print(
 
-            print(item)
+            parts[0]
+            + "|"
+            + parts[1]
+            + "| Password: "
+            + decrypted
+
+        )
