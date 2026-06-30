@@ -1,13 +1,12 @@
 MASTER_PASSWORD = "admin123"
 
-PIN = "1234"
-
 
 def check_login(password):
 
-    return password == MASTER_PASSWORD
+    if password == MASTER_PASSWORD:
 
+        return True
 
-def check_pin(pin):
+    else:
 
-    return pin == PIN
+        return False

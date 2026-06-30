@@ -1,250 +1,365 @@
 from tkinter import *
-from tkinter import ttk
 from tkinter import messagebox
-from tkinter import filedialog
-from tkinter import simpledialog
-
-from datetime import datetime
-
-import csv
 import pyperclip
-import shutil
+import time
 
 from auth import *
-from database import *
 from generator import generate_password
+from database import *
 from security import *
 
 create_table()
 
-dark_mode = True
 show_password = False
+dark_mode = True
 
 
-# ---------------- MAIN APP ---------------- #
+def update_clock():
+
+    current = time.strftime("%H:%M:%S")
+
+    clock_label.config(
+        text=current
+    )
+
+    clock_label.after(
+        1000,
+        update_clock
+    )
+
+
+def update_counter():
+
+    data = view_passwords_db()
+
+    total = len(data)
+
+    counter_label.config(
+        text=f"Stored Passwords\n{total}"
+    )
+
+
+def toggle_theme():
+
+    global dark_mode
+
+    if dark_mode:
+
+        window.config(bg="white")
+
+        output.config(
+            bg="white",
+            fg="black"
+        )
+
+        dark_mode = False
+
+    else:
+
+        window.config(bg="#0a0f1f")
+
+        output.config(
+            bg="#1a1a1a",
+            fg="lime"
+        )
+
+        dark_mode = True
+
 
 def open_main_app():
 
-    global root
+    global window
     global website_entry
     global username_entry
     global password_entry
     global category_entry
     global notes_entry
     global output
-    global stats_label
-    global theme_button
+    global clock_label
+    global counter_label
 
-    root = Tk()
+    window = Tk()
 
-    root.title(
-        "Password Manager v14.0"
+    window.title(
+        "CYBER VAULT v16.0"
     )
 
-    root.geometry(
-        "1250x750"
+    window.geometry(
+        "1200x900"
     )
 
-    root.config(
-        bg="#0d1117"
+    window.config(
+        bg="#0a0f1f"
     )
 
-    # ---------------- TOP BAR ---------------- #
+    sidebar = Frame(
 
-    topbar = Frame(
-        root,
-        bg="#161b22",
-        height=60
+        window,
+
+        bg="#111827",
+
+        width=160
+
     )
 
-    topbar.pack(
-        fill=X
+    sidebar.pack(
+        side=LEFT,
+        fill=Y
+    )
+    sidebar.pack_propagate(False)
+    
+
+    logo = Label(
+
+        sidebar,
+
+        text="CYBER\nVAULT",
+
+        bg="#111827",
+
+        fg="cyan",
+
+        font=("Arial", 28, "bold")
+
+    )
+
+    logo.pack(pady=20)
+
+    counter_label = Label(
+
+        sidebar,
+
+        text="Stored Passwords\n0",
+
+        bg="#111827",
+
+        fg="white",
+
+        font=("Arial", 14, "bold")
+
+    )
+
+    counter_label.pack(pady=20)
+
+    clock_label = Label(
+
+        sidebar,
+
+        text="",
+
+        bg="#111827",
+
+        fg="lime",
+
+        font=("Arial", 16, "bold")
+
+    )
+
+    clock_label.pack(pady=20)
+
+    update_clock()
+
+    main_frame = Frame(
+
+        window,
+
+        bg="#0a0f1f"
+
+    )
+
+    main_frame.pack(
+        side=LEFT,
+        fill=BOTH,
+        expand=True,
+        padx=30,
+        pady=20
     )
 
     title = Label(
 
-        topbar,
+        main_frame,
 
-        text="🔐 PASSWORD MANAGER v14.0",
+        text="Password Manager",
 
-        bg="#161b22",
+        font=("Arial", 26, "bold"),
 
-        fg="#00ffcc",
-
-        font=("Arial", 22, "bold")
-
-    )
-
-    title.pack(
-        side=LEFT,
-        padx=20,
-        pady=10
-    )
-
-    theme_button = Button(
-
-        topbar,
-
-        text="☀ Light Mode",
-
-        command=toggle_theme,
-
-        bg="#30363d",
+        bg="#0a0f1f",
 
         fg="white"
 
     )
 
-    theme_button.pack(
-        side=RIGHT,
-        padx=20
-    )
+    title.pack(pady=10)
 
-    # ---------------- NOTEBOOK ---------------- #
+    website_label = Label(
 
-    notebook = ttk.Notebook(
-        root
-    )
+        main_frame,
 
-    notebook.pack(
-        fill=BOTH,
-        expand=True
-    )
+        text="Website",
 
-    dashboard_tab = Frame(
-        notebook,
-        bg="#0d1117"
-    )
-
-    vault_tab = Frame(
-        notebook,
-        bg="#0d1117"
-    )
-
-    settings_tab = Frame(
-        notebook,
-        bg="#0d1117"
-    )
-
-    notebook.add(
-        dashboard_tab,
-        text="Dashboard"
-    )
-
-    notebook.add(
-        vault_tab,
-        text="Vault"
-    )
-
-    notebook.add(
-        settings_tab,
-        text="Settings"
-    )
-
-    # ---------------- DASHBOARD ---------------- #
-
-    heading = Label(
-
-        dashboard_tab,
-
-        text="Cyber Security Vault",
-
-        bg="#0d1117",
+        bg="#0a0f1f",
 
         fg="white",
 
-        font=("Arial", 26, "bold")
+        font=("Arial", 12)
 
     )
 
-    heading.pack(pady=20)
-
-    form = Frame(
-        dashboard_tab,
-        bg="#0d1117"
-    )
-
-    form.pack()
-
-    Label(
-        form,
-        text="Website",
-        bg="#0d1117",
-        fg="white"
-    ).grid(row=0, column=0, pady=10)
+    website_label.pack()
 
     website_entry = Entry(
-        form,
-        width=45
+
+        main_frame,
+
+        width=45,
+
+        font=("Arial", 12)
+
     )
 
-    website_entry.grid(row=0, column=1)
+    website_entry.pack(pady=5)
 
-    Label(
-        form,
+    username_label = Label(
+
+        main_frame,
+
         text="Username",
-        bg="#0d1117",
-        fg="white"
-    ).grid(row=1, column=0, pady=10)
+
+        bg="#0a0f1f",
+
+        fg="white",
+
+        font=("Arial", 12)
+
+    )
+
+    username_label.pack()
 
     username_entry = Entry(
-        form,
-        width=45
+
+        main_frame,
+
+        width=45,
+
+        font=("Arial", 12)
+
     )
 
-    username_entry.grid(row=1, column=1)
+    username_entry.pack(pady=5)
 
-    Label(
-        form,
+    password_label = Label(
+
+        main_frame,
+
         text="Password",
-        bg="#0d1117",
-        fg="white"
-    ).grid(row=2, column=0, pady=10)
+
+        bg="#0a0f1f",
+
+        fg="white",
+
+        font=("Arial", 12)
+
+    )
+
+    password_label.pack()
 
     password_entry = Entry(
-        form,
+
+        main_frame,
+
         width=45,
-        show="*"
+
+        show="*",
+
+        font=("Arial", 12)
+
     )
 
-    password_entry.grid(row=2, column=1)
+    password_entry.pack(pady=5)
 
-    Label(
-        form,
+    category_label = Label(
+
+        main_frame,
+
         text="Category",
-        bg="#0d1117",
-        fg="white"
-    ).grid(row=3, column=0, pady=10)
+
+        bg="#0a0f1f",
+
+        fg="white",
+
+        font=("Arial", 12)
+
+    )
+
+    category_label.pack()
 
     category_entry = Entry(
-        form,
-        width=45
+
+        main_frame,
+
+        width=45,
+
+        font=("Arial", 12)
+
     )
 
-    category_entry.grid(row=3, column=1)
+    category_entry.pack(pady=5)
 
-    Label(
-        form,
+    notes_label = Label(
+
+        main_frame,
+
         text="Notes",
-        bg="#0d1117",
-        fg="white"
-    ).grid(row=4, column=0, pady=10)
+
+        bg="#0a0f1f",
+
+        fg="white",
+
+        font=("Arial", 12)
+
+    )
+
+    notes_label.pack()
 
     notes_entry = Entry(
-        form,
-        width=45
+
+        main_frame,
+
+        width=45,
+
+        font=("Arial", 12)
+
     )
 
-    notes_entry.grid(row=4, column=1)
+    notes_entry.pack(pady=5)
 
-    # ---------------- BUTTONS ---------------- #
+    output = Text(
+
+        main_frame,
+
+        height=12,
+
+        width=70,
+
+        bg="#1a1a1a",
+
+        fg="lime",
+
+        font=("Consolas", 10)
+
+    )
+
+    output.pack(pady=15)
 
     button_frame = Frame(
-        dashboard_tab,
-        bg="#0d1117"
+
+        main_frame,
+
+        bg="#0a0f1f"
+
     )
 
-    button_frame.pack(pady=20)
+    button_frame.pack()
 
     Button(
 
@@ -254,13 +369,13 @@ def open_main_app():
 
         command=save_password,
 
-        bg="#238636",
+        bg="green",
 
         fg="white",
 
-        width=18
+        width=20
 
-    ).grid(row=0, column=0, padx=5)
+    ).grid(row=0, column=0, padx=5, pady=5)
 
     Button(
 
@@ -270,29 +385,29 @@ def open_main_app():
 
         command=view_passwords,
 
-        bg="#1f6feb",
+        bg="blue",
 
         fg="white",
 
-        width=18
+        width=20
 
-    ).grid(row=0, column=1, padx=5)
+    ).grid(row=0, column=1, padx=5, pady=5)
 
     Button(
 
         button_frame,
 
-        text="Generate Password",
+        text="Search Password",
 
-        command=generate_password_gui,
+        command=search_password,
 
-        bg="#8957e5",
+        bg="orange",
 
         fg="white",
 
-        width=18
+        width=20
 
-    ).grid(row=0, column=2, padx=5)
+    ).grid(row=1, column=0, padx=5, pady=5)
 
     Button(
 
@@ -302,13 +417,29 @@ def open_main_app():
 
         command=delete_password_gui,
 
-        bg="#f85149",
+        bg="red",
 
         fg="white",
 
-        width=18
+        width=20
 
-    ).grid(row=0, column=3, padx=5)
+    ).grid(row=1, column=1, padx=5, pady=5)
+
+    Button(
+
+        button_frame,
+
+        text="Generate Password",
+
+        command=generate_password_gui,
+
+        bg="purple",
+
+        fg="white",
+
+        width=20
+
+    ).grid(row=2, column=0, padx=5, pady=5)
 
     Button(
 
@@ -318,13 +449,13 @@ def open_main_app():
 
         command=copy_password,
 
-        bg="#d29922",
+        bg="brown",
 
-        fg="black",
+        fg="white",
 
-        width=18
+        width=20
 
-    ).grid(row=1, column=0, pady=10)
+    ).grid(row=2, column=1, padx=5, pady=5)
 
     Button(
 
@@ -334,268 +465,49 @@ def open_main_app():
 
         command=toggle_password,
 
-        bg="#30363d",
+        bg="gray",
 
         fg="white",
 
-        width=18
+        width=20
 
-    ).grid(row=1, column=1)
+    ).grid(row=3, column=0, padx=5, pady=5)
 
     Button(
 
         button_frame,
 
-        text="Export CSV",
+        text="Clear Fields",
 
-        command=export_csv,
-
-        bg="#ff7b72",
-
-        fg="white",
-
-        width=18
-
-    ).grid(row=1, column=2)
-
-    Button(
-
-        button_frame,
-
-        text="Backup DB",
-
-        command=backup_database,
-
-        bg="#00b4d8",
-
-        fg="black",
-
-        width=18
-
-    ).grid(row=1, column=3)
-
-    # ---------------- OUTPUT ---------------- #
-
-    output = Text(
-
-        dashboard_tab,
-
-        width=120,
-
-        height=18,
-
-        bg="#161b22",
-
-        fg="#00ffcc",
-
-        font=("Consolas", 10)
-
-    )
-
-    output.pack(pady=20)
-
-    # ---------------- VAULT TAB ---------------- #
-
-    stats_label = Label(
-
-        vault_tab,
-
-        text=f"Saved Passwords: {total_passwords_db()}",
-
-        bg="#0d1117",
-
-        fg="yellow",
-
-        font=("Arial", 22, "bold")
-
-    )
-
-    stats_label.pack(pady=50)
-
-    Button(
-
-        vault_tab,
-
-        text="🔒 SECRET VAULT",
-
-        command=secret_vault,
+        command=clear_fields,
 
         bg="black",
 
-        fg="#00ffcc",
-
-        width=30,
-
-        height=2,
-
-        font=("Arial", 14, "bold")
-
-    ).pack(pady=20)
-
-    # ---------------- SETTINGS TAB ---------------- #
-
-    Label(
-
-        settings_tab,
-
-        text="Security Settings",
-
-        bg="#0d1117",
-
         fg="white",
 
-        font=("Arial", 24, "bold")
+        width=20
 
-    ).pack(pady=30)
+    ).grid(row=3, column=1, padx=5, pady=5)
 
     Button(
 
-        settings_tab,
+        button_frame,
 
-        text="PIN Lock",
+        text="Theme Switch",
 
-        command=pin_lock,
+        command=toggle_theme,
 
-        bg="#8957e5",
+        bg="cyan",
 
-        fg="white",
+        fg="black",
 
-        width=30,
+        width=20
 
-        height=2
+    ).grid(row=4, column=0, padx=5, pady=5)
 
-    ).pack(pady=10)
+    update_counter()
 
-    Button(
-
-        settings_tab,
-
-        text="Auto Logout",
-
-        command=auto_logout,
-
-        bg="#f85149",
-
-        fg="white",
-
-        width=30,
-
-        height=2
-
-    ).pack(pady=10)
-
-    root.mainloop()
-
-
-# ---------------- FUNCTIONS ---------------- #
-
-def save_password():
-
-    website = website_entry.get()
-    username = username_entry.get()
-    password = password_entry.get()
-    category = category_entry.get()
-    notes = notes_entry.get()
-
-    encrypted = encrypt_password(
-        password
-    )
-
-    created_at = datetime.now().strftime(
-        "%d-%m-%Y %H:%M:%S"
-    )
-
-    save_password_db(
-
-        website,
-        username,
-        encrypted,
-        category,
-        notes,
-        created_at
-
-    )
-
-    stats_label.config(
-        text=f"Saved Passwords: {total_passwords_db()}"
-    )
-
-    messagebox.showinfo(
-        "Saved",
-        "Password Saved"
-    )
-
-    clear_fields()
-
-
-def view_passwords():
-
-    output.delete(
-        1.0,
-        END
-    )
-
-    data = view_passwords_db()
-
-    for row in data:
-
-        decrypted = decrypt_password(
-            row[3]
-        )
-
-        output.insert(
-
-            END,
-
-            f"""
-Website : {row[1]}
-Username: {row[2]}
-Password: {decrypted}
-Category: {row[4]}
-Notes   : {row[5]}
-Created : {row[6]}
-
--------------------------------------
-"""
-
-        )
-
-
-def generate_password_gui():
-
-    password_entry.delete(
-        0,
-        END
-    )
-
-    password_entry.insert(
-        0,
-        generate_password()
-    )
-
-
-def delete_password_gui():
-
-    delete_password_db(
-        website_entry.get()
-    )
-
-    messagebox.showinfo(
-        "Deleted",
-        "Password Deleted"
-    )
-
-
-def copy_password():
-
-    pyperclip.copy(
-        password_entry.get()
-    )
-
-    messagebox.showinfo(
-        "Copied",
-        "Password Copied"
-    )
+    window.mainloop()
 
 
 def toggle_password():
@@ -619,151 +531,260 @@ def toggle_password():
         show_password = True
 
 
-def clear_fields():
+def check_strength(password):
 
-    website_entry.delete(0, END)
-    username_entry.delete(0, END)
-    password_entry.delete(0, END)
-    category_entry.delete(0, END)
-    notes_entry.delete(0, END)
+    if len(password) < 6:
+
+        return "Weak"
+
+    elif len(password) < 10:
+
+        return "Medium"
+
+    else:
+
+        return "Strong"
 
 
-def export_csv():
+def save_password():
+
+    website = website_entry.get()
+
+    username = username_entry.get()
+
+    password = password_entry.get()
+
+    category = category_entry.get()
+
+    notes = notes_entry.get()
+
+    encrypted = encrypt_password(
+        password
+    )
+
+    save_password_db(
+
+        website,
+
+        username,
+
+        encrypted,
+
+        category,
+
+        notes
+
+    )
+
+    update_counter()
+
+    messagebox.showinfo(
+
+        "Saved",
+
+        "Password Saved"
+
+    )
+
+
+def view_passwords():
+
+    output.delete(
+        1.0,
+        END
+    )
 
     data = view_passwords_db()
 
-    with open(
+    for row in data:
 
-        "password_export.csv",
+        decrypted = decrypt_password(
+            row[3]
+        )
 
-        "w",
+        output.insert(
 
-        newline=""
+            END,
 
-    ) as file:
-
-        writer = csv.writer(file)
-
-        writer.writerow(
-
-            [
-                "Website",
-                "Username",
-                "Password",
-                "Category",
-                "Notes",
-                "Created"
-            ]
+            f"Website : {row[1]}\n"
 
         )
 
-        for row in data:
+        output.insert(
 
-            writer.writerow(
+            END,
 
-                [
-                    row[1],
-                    row[2],
-                    decrypt_password(row[3]),
-                    row[4],
-                    row[5],
-                    row[6]
-                ]
+            f"Username: {row[2]}\n"
 
-            )
+        )
+
+        output.insert(
+
+            END,
+
+            f"Password: {decrypted}\n"
+
+        )
+
+        output.insert(
+
+            END,
+
+            f"Category: {row[4]}\n"
+
+        )
+
+        output.insert(
+
+            END,
+
+            f"Notes   : {row[5]}\n"
+
+        )
+
+        output.insert(
+
+            END,
+
+            "-----------------------------\n"
+
+        )
+
+
+def search_password():
+
+    output.delete(
+        1.0,
+        END
+    )
+
+    website = website_entry.get()
+
+    data = search_password_db(
+        website
+    )
+
+    for row in data:
+
+        decrypted = decrypt_password(
+            row[3]
+        )
+
+        output.insert(
+
+            END,
+
+            f"Website : {row[1]}\n"
+
+        )
+
+        output.insert(
+
+            END,
+
+            f"Username: {row[2]}\n"
+
+        )
+
+        output.insert(
+
+            END,
+
+            f"Password: {decrypted}\n"
+
+        )
+
+        output.insert(
+
+            END,
+
+            "-----------------------------\n"
+
+        )
+
+
+def delete_password_gui():
+
+    website = website_entry.get()
+
+    delete_password_db(
+        website
+    )
+
+    update_counter()
 
     messagebox.showinfo(
-        "Exported",
-        "CSV Exported"
+
+        "Deleted",
+
+        "Password Deleted"
+
     )
 
 
-def backup_database():
+def generate_password_gui():
 
-    shutil.copy(
-        "passwords.db",
-        "backup_passwords.db"
+    password_entry.delete(
+        0,
+        END
+    )
+
+    new_password = generate_password()
+
+    password_entry.insert(
+        0,
+        new_password
+    )
+
+
+def clear_fields():
+
+    website_entry.delete(
+        0,
+        END
+    )
+
+    username_entry.delete(
+        0,
+        END
+    )
+
+    password_entry.delete(
+        0,
+        END
+    )
+
+    category_entry.delete(
+        0,
+        END
+    )
+
+    notes_entry.delete(
+        0,
+        END
+    )
+
+
+def copy_password():
+
+    password = password_entry.get()
+
+    pyperclip.copy(
+        password
     )
 
     messagebox.showinfo(
-        "Backup",
-        "Database Backup Created"
+
+        "Copied",
+
+        "Password Copied"
+
     )
 
-
-def secret_vault():
-
-    messagebox.showinfo(
-        "Vault",
-        "🔥 Secret Vault Activated 🔥"
-    )
-
-
-def pin_lock():
-
-    pin = simpledialog.askstring(
-        "PIN",
-        "Enter PIN"
-    )
-
-    if check_pin(pin):
-
-        messagebox.showinfo(
-            "Access",
-            "PIN Accepted"
-        )
-
-    else:
-
-        messagebox.showerror(
-            "Error",
-            "Wrong PIN"
-        )
-
-
-def auto_logout():
-
-    root.after(
-        30000,
-        root.destroy
-    )
-
-    messagebox.showinfo(
-        "Auto Logout",
-        "App Will Close In 30 Seconds"
-    )
-
-
-def toggle_theme():
-
-    global dark_mode
-
-    if dark_mode:
-
-        root.config(bg="white")
-
-        theme_button.config(
-            text="🌙 Dark Mode"
-        )
-
-        dark_mode = False
-
-    else:
-
-        root.config(bg="#0d1117")
-
-        theme_button.config(
-            text="☀ Light Mode"
-        )
-
-        dark_mode = True
-
-
-# ---------------- LOGIN ---------------- #
 
 def login():
 
-    password = password_entry_login.get()
+    password = login_password_entry.get()
 
     if check_login(password):
 
@@ -774,15 +795,18 @@ def login():
     else:
 
         messagebox.showerror(
+
             "Error",
+
             "Wrong Password"
+
         )
 
 
 login_window = Tk()
 
 login_window.title(
-    "Login"
+    "Cyber Vault Login"
 )
 
 login_window.geometry(
@@ -790,40 +814,42 @@ login_window.geometry(
 )
 
 login_window.config(
-    bg="#0d1117"
+    bg="#0a0f1f"
 )
 
 title = Label(
 
     login_window,
 
-    text="PASSWORD MANAGER",
+    text="CYBER VAULT",
 
-    font=("Arial", 24, "bold"),
+    font=("Arial", 28, "bold"),
 
-    bg="#0d1117",
+    bg="#0a0f1f",
 
-    fg="#00ffcc"
+    fg="cyan"
 
 )
 
-title.pack(pady=40)
+title.pack(pady=30)
 
-Label(
+password_label = Label(
 
     login_window,
 
     text="Master Password",
 
-    bg="#0d1117",
+    bg="#0a0f1f",
 
     fg="white",
 
-    font=("Arial", 12)
+    font=("Arial", 14)
 
-).pack(pady=10)
+)
 
-password_entry_login = Entry(
+password_label.pack(pady=10)
+
+login_password_entry = Entry(
 
     login_window,
 
@@ -831,13 +857,13 @@ password_entry_login = Entry(
 
     width=30,
 
-    font=("Arial", 12)
+    font=("Arial", 14)
 
 )
 
-password_entry_login.pack(pady=10)
+login_password_entry.pack(pady=10)
 
-Button(
+login_button = Button(
 
     login_window,
 
@@ -845,7 +871,7 @@ Button(
 
     command=login,
 
-    bg="#238636",
+    bg="green",
 
     fg="white",
 
@@ -853,6 +879,8 @@ Button(
 
     font=("Arial", 12, "bold")
 
-).pack(pady=20)
+)
+
+login_button.pack(pady=20)
 
 login_window.mainloop()

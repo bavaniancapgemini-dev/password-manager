@@ -15,6 +15,8 @@ def create_table():
 
         id INTEGER PRIMARY KEY AUTOINCREMENT,
 
+        username_owner TEXT,
+
         website TEXT,
 
         username TEXT,
@@ -38,6 +40,7 @@ def create_table():
 
 def save_password_db(
 
+    username_owner,
     website,
     username,
     password,
@@ -58,6 +61,7 @@ def save_password_db(
         """
         INSERT INTO passwords
         (
+            username_owner,
             website,
             username,
             password,
@@ -66,10 +70,11 @@ def save_password_db(
             created_at
         )
 
-        VALUES (?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
         """,
 
         (
+            username_owner,
             website,
             username,
             password,
@@ -85,26 +90,7 @@ def save_password_db(
     conn.close()
 
 
-def view_passwords_db():
-
-    conn = sqlite3.connect(
-        "passwords.db"
-    )
-
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "SELECT * FROM passwords"
-    )
-
-    data = cursor.fetchall()
-
-    conn.close()
-
-    return data
-
-
-def search_password_db(website):
+def view_passwords_db(owner):
 
     conn = sqlite3.connect(
         "passwords.db"
@@ -117,11 +103,11 @@ def search_password_db(website):
         """
         SELECT *
         FROM passwords
-        WHERE website LIKE ?
+        WHERE username_owner=?
         """,
 
         (
-            "%" + website + "%",
+            owner,
         )
 
     )
@@ -133,7 +119,67 @@ def search_password_db(website):
     return data
 
 
-def delete_password_db(website):
+def search_password_db(owner, website):
+
+    conn = sqlite3.connect(
+        "passwords.db"
+    )
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        """
+        SELECT *
+        FROM passwords
+        WHERE username_owner=? AND website LIKE ?
+        """,
+
+        (
+            owner,
+            "%" + website + "%"
+        )
+
+    )
+
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return data
+
+
+def search_category_db(owner, category):
+
+    conn = sqlite3.connect(
+        "passwords.db"
+    )
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        """
+        SELECT *
+        FROM passwords
+        WHERE username_owner=? AND category LIKE ?
+        """,
+
+        (
+            owner,
+            "%" + category + "%"
+        )
+
+    )
+
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return data
+
+
+def delete_password_db(owner, website):
 
     conn = sqlite3.connect(
         "passwords.db"
@@ -145,11 +191,12 @@ def delete_password_db(website):
 
         """
         DELETE FROM passwords
-        WHERE website=?
+        WHERE username_owner=? AND website=?
         """,
 
         (
-            website,
+            owner,
+            website
         )
 
     )
@@ -159,7 +206,7 @@ def delete_password_db(website):
     conn.close()
 
 
-def total_passwords_db():
+def total_passwords_db(owner):
 
     conn = sqlite3.connect(
         "passwords.db"
@@ -168,7 +215,17 @@ def total_passwords_db():
     cursor = conn.cursor()
 
     cursor.execute(
-        "SELECT COUNT(*) FROM passwords"
+
+        """
+        SELECT COUNT(*)
+        FROM passwords
+        WHERE username_owner=?
+        """,
+
+        (
+            owner,
+        )
+
     )
 
     total = cursor.fetchone()[0]
