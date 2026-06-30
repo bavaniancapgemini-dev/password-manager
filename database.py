@@ -1,5 +1,6 @@
 import sqlite3
 
+
 def create_table():
 
     conn = sqlite3.connect(
@@ -22,7 +23,9 @@ def create_table():
 
         category TEXT,
 
-        notes TEXT
+        notes TEXT,
+
+        created_at TEXT
 
         )
         """
@@ -32,17 +35,15 @@ def create_table():
 
     conn.close()
 
+
 def save_password_db(
 
     website,
-
     username,
-
     password,
-
     category,
-
-    notes
+    notes,
+    created_at
 
 ):
 
@@ -61,10 +62,11 @@ def save_password_db(
             username,
             password,
             category,
-            notes
+            notes,
+            created_at
         )
 
-        VALUES (?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?)
         """,
 
         (
@@ -72,7 +74,8 @@ def save_password_db(
             username,
             password,
             category,
-            notes
+            notes,
+            created_at
         )
 
     )
@@ -80,6 +83,7 @@ def save_password_db(
     conn.commit()
 
     conn.close()
+
 
 def view_passwords_db():
 
@@ -90,10 +94,7 @@ def view_passwords_db():
     cursor = conn.cursor()
 
     cursor.execute(
-        """
-        SELECT *
-        FROM passwords
-        """
+        "SELECT * FROM passwords"
     )
 
     data = cursor.fetchall()
@@ -102,60 +103,8 @@ def view_passwords_db():
 
     return data
 
-def search_password_db(
-    website
-):
 
-    conn = sqlite3.connect(
-        "passwords.db"
-    )
-
-    cursor = conn.cursor()
-
-    cursor.execute(
-        """
-        SELECT *
-        FROM passwords
-        WHERE website LIKE ?
-        """,
-        (
-            "%" + website + "%",
-        )
-    )
-
-    data = cursor.fetchall()
-
-    conn.close()
-
-    return data
-
-def delete_password_db(
-    website
-):
-
-    conn = sqlite3.connect(
-        "passwords.db"
-    )
-
-    cursor = conn.cursor()
-
-    cursor.execute(
-        """
-        DELETE FROM passwords
-        WHERE website=?
-        """,
-        (
-            website,
-        )
-    )
-
-    conn.commit()
-
-    conn.close()
-
-def search_password_db(
-    website
-):
+def search_password_db(website):
 
     conn = sqlite3.connect(
         "passwords.db"
@@ -183,9 +132,8 @@ def search_password_db(
 
     return data
 
-def delete_password_db(
-    website
-):
+
+def delete_password_db(website):
 
     conn = sqlite3.connect(
         "passwords.db"
@@ -210,9 +158,8 @@ def delete_password_db(
 
     conn.close()
 
-def search_password_db(
-    website
-):
+
+def total_passwords_db():
 
     conn = sqlite3.connect(
         "passwords.db"
@@ -221,21 +168,11 @@ def search_password_db(
     cursor = conn.cursor()
 
     cursor.execute(
-
-        """
-        SELECT *
-        FROM passwords
-        WHERE website LIKE ?
-        """,
-
-        (
-            "%" + website + "%",
-        )
-
+        "SELECT COUNT(*) FROM passwords"
     )
 
-    data = cursor.fetchall()
+    total = cursor.fetchone()[0]
 
     conn.close()
 
-    return data
+    return total
