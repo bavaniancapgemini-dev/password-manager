@@ -1,11 +1,8 @@
 import sqlite3
 
-
 def create_table():
 
-    conn = sqlite3.connect(
-        "passwords.db"
-    )
+    conn = sqlite3.connect("passwords.db")
 
     cursor = conn.cursor()
 
@@ -13,22 +10,19 @@ def create_table():
         """
         CREATE TABLE IF NOT EXISTS passwords(
 
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-        username_owner TEXT,
+            website TEXT,
 
-        website TEXT,
+            username TEXT,
 
-        username TEXT,
+            password TEXT,
 
-        password TEXT,
+            category TEXT,
 
-        category TEXT,
+            notes TEXT,
 
-        notes TEXT,
-
-        created_at TEXT
-
+            username_owner TEXT
         )
         """
     )
@@ -37,22 +31,18 @@ def create_table():
 
     conn.close()
 
-
 def save_password_db(
 
-    username_owner,
     website,
     username,
     password,
     category,
     notes,
-    created_at
+    owner
 
 ):
 
-    conn = sqlite3.connect(
-        "passwords.db"
-    )
+    conn = sqlite3.connect("passwords.db")
 
     cursor = conn.cursor()
 
@@ -61,26 +51,24 @@ def save_password_db(
         """
         INSERT INTO passwords
         (
-            username_owner,
             website,
             username,
             password,
             category,
             notes,
-            created_at
+            username_owner
         )
 
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?)
         """,
 
         (
-            username_owner,
             website,
             username,
             password,
             category,
             notes,
-            created_at
+            owner
         )
 
     )
@@ -89,12 +77,9 @@ def save_password_db(
 
     conn.close()
 
-
 def view_passwords_db(owner):
 
-    conn = sqlite3.connect(
-        "passwords.db"
-    )
+    conn = sqlite3.connect("passwords.db")
 
     cursor = conn.cursor()
 
@@ -118,12 +103,14 @@ def view_passwords_db(owner):
 
     return data
 
+def search_password_db(
 
-def search_password_db(owner, website):
+    website,
+    owner
 
-    conn = sqlite3.connect(
-        "passwords.db"
-    )
+):
+
+    conn = sqlite3.connect("passwords.db")
 
     cursor = conn.cursor()
 
@@ -132,12 +119,13 @@ def search_password_db(owner, website):
         """
         SELECT *
         FROM passwords
-        WHERE username_owner=? AND website LIKE ?
+        WHERE website LIKE ?
+        AND username_owner=?
         """,
 
         (
-            owner,
-            "%" + website + "%"
+            "%" + website + "%",
+            owner
         )
 
     )
@@ -148,42 +136,14 @@ def search_password_db(owner, website):
 
     return data
 
+def delete_password_db(
 
-def search_category_db(owner, category):
+    website,
+    owner
 
-    conn = sqlite3.connect(
-        "passwords.db"
-    )
+):
 
-    cursor = conn.cursor()
-
-    cursor.execute(
-
-        """
-        SELECT *
-        FROM passwords
-        WHERE username_owner=? AND category LIKE ?
-        """,
-
-        (
-            owner,
-            "%" + category + "%"
-        )
-
-    )
-
-    data = cursor.fetchall()
-
-    conn.close()
-
-    return data
-
-
-def delete_password_db(owner, website):
-
-    conn = sqlite3.connect(
-        "passwords.db"
-    )
+    conn = sqlite3.connect("passwords.db")
 
     cursor = conn.cursor()
 
@@ -191,12 +151,13 @@ def delete_password_db(owner, website):
 
         """
         DELETE FROM passwords
-        WHERE username_owner=? AND website=?
+        WHERE website=?
+        AND username_owner=?
         """,
 
         (
-            owner,
-            website
+            website,
+            owner
         )
 
     )
@@ -204,32 +165,3 @@ def delete_password_db(owner, website):
     conn.commit()
 
     conn.close()
-
-
-def total_passwords_db(owner):
-
-    conn = sqlite3.connect(
-        "passwords.db"
-    )
-
-    cursor = conn.cursor()
-
-    cursor.execute(
-
-        """
-        SELECT COUNT(*)
-        FROM passwords
-        WHERE username_owner=?
-        """,
-
-        (
-            owner,
-        )
-
-    )
-
-    total = cursor.fetchone()[0]
-
-    conn.close()
-
-    return total

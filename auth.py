@@ -10,3 +10,9 @@ def check_login(password):
     else:
 
         return False
+    
+MASTER_PASSWORD = "admin123"
+
+def check_login(password):
+
+    return password == MASTER_PASSWORD

@@ -1,15 +1,24 @@
 import random
 import string
 
+def generate_password(length=14):
 
-def generate_password():
+    characters = (
 
-    characters = string.ascii_letters + string.digits + "!@#$%"
+        string.ascii_letters +
 
-    password = ""
+        string.digits +
 
-    for i in range(10):
+        "!@#$%^&*"
 
-        password += random.choice(characters)
+    )
+
+    password = "".join(
+
+        random.choice(characters)
+
+        for _ in range(length)
+
+    )
 
     return password

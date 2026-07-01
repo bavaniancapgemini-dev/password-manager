@@ -1,0 +1,21 @@
+APP_NAME = "CYBER VAULT"
+
+VERSION = "v19.0"
+
+BG_COLOR = "#000814"
+
+SIDEBAR_COLOR = "#0f172a"
+
+CARD_COLOR = "#111827"
+
+TEXT_COLOR = "white"
+
+CYAN = "#00F5FF"
+
+GREEN = "#39FF14"
+
+RED = "#ff1744"
+
+YELLOW = "#ffea00"
+
+FONT = "Arial"
