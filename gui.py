@@ -4,7 +4,7 @@ from tkinter import messagebox
 from datetime import datetime
 import pyperclip
 
-from auth import *
+from user_auth import *
 from generator import generate_password
 from database import *
 from security import *
@@ -13,10 +13,14 @@ from backup import *
 from stats import *
 from config import *
 from cyber_theme import *
+from activity import *
+from health import *
 
 create_table()
 
-CURRENT_USER = "admin"
+create_user_table()
+
+CURRENT_USER = ""
 
 show_password = False
 
@@ -129,6 +133,21 @@ terminal = Text(
 )
 
 terminal.pack(pady=20)
+security_score = Label(
+
+    sidebar,
+
+    text="Security Score\n100%",
+
+    bg=SIDEBAR_COLOR,
+
+    fg=GREEN,
+
+    font=(FONT, 20, "bold")
+
+)
+
+security_score.pack(pady=20)
 
 terminal.insert(
 
@@ -449,6 +468,32 @@ def refresh_table():
         CURRENT_USER
     )
 
+    analysis = analyze_passwords(data)
+
+    security_score.config(
+
+        text=f"Security Score\n{analysis['score']}%"
+
+    )
+
+    if analysis["score"] < 50:
+
+        security_score.config(
+        fg=RED
+        )
+
+    elif analysis["score"] < 80:
+
+        security_score.config(
+        fg=YELLOW
+        )
+
+    else:
+
+        security_score.config(
+        fg=GREEN
+        )
+
     for row in data:
 
         decrypted = decrypt_password(
@@ -499,6 +544,12 @@ def save_password():
     encrypted = encrypt_password(
         password
     )
+    log_activity(
+
+    f"{CURRENT_USER} saved password for {website}"
+
+    )
+    
 
     save_password_db(
 
@@ -585,6 +636,11 @@ def delete_password_gui():
         website,
 
         CURRENT_USER
+
+    )
+    log_activity(
+
+    f"{CURRENT_USER} deleted password for {website}"
 
     )
 
@@ -687,6 +743,82 @@ button_frame = Frame(
 
     bg=BG_COLOR
 
+)
+
+def view_activity():
+
+    activity_window = Toplevel()
+
+    activity_window.title(
+        "Activity Logs"
+    )
+
+    activity_window.geometry(
+        "700x500"
+    )
+
+    text = Text(
+
+        activity_window,
+
+        bg="black",
+
+        fg="lime",
+
+        font=("Consolas", 10)
+
+    )
+
+    text.pack(
+        fill=BOTH,
+        expand=True
+    )
+
+    try:
+
+        with open(
+            "activity.log",
+            "r"
+        ) as file:
+
+            logs = file.read()
+
+            text.insert(
+                END,
+                logs
+            )
+
+    except:
+
+        text.insert(
+            END,
+            "No activity logs yet."
+        )
+
+activity_button = Button(
+
+    button_frame,
+
+    text="Activity Logs",
+
+    command=view_activity,
+
+    width=18
+
+)
+
+button_style(
+
+    activity_button,
+
+    "#00bfa5"
+
+)
+
+activity_button.grid(
+    row=2,
+    column=2,
+    pady=10
 )
 
 button_frame.pack(pady=20)
@@ -929,3 +1061,209 @@ refresh_table()
 update_clock()
 
 window.mainloop()
+
+window.withdraw()
+
+login_window = Toplevel()
+
+login_window.title("CYBER VAULT Login")
+
+login_window.geometry("500x500")
+
+login_window.config(bg=BG_COLOR)
+
+login_title = Label(
+
+    login_window,
+
+    text="CYBER VAULT",
+
+    bg=BG_COLOR,
+
+    fg=CYAN,
+
+    font=(FONT, 30, "bold")
+
+)
+
+login_title.pack(pady=40)
+
+username_label = Label(
+
+    login_window,
+
+    text="Username",
+
+    bg=BG_COLOR,
+
+    fg="white",
+
+    font=(FONT, 14)
+
+)
+
+username_label.pack(pady=10)
+
+username_entry_login = Entry(
+
+    login_window,
+
+    width=30,
+
+    font=(FONT, 14)
+
+)
+
+username_entry_login.pack(pady=10)
+
+password_label = Label(
+
+    login_window,
+
+    text="Password",
+
+    bg=BG_COLOR,
+
+    fg="white",
+
+    font=(FONT, 14)
+
+)
+
+password_label.pack(pady=10)
+
+password_entry_login = Entry(
+
+    login_window,
+
+    width=30,
+
+    show="*",
+
+    font=(FONT, 14)
+
+)
+
+password_entry_login.pack(pady=10)
+
+def login():
+
+    global CURRENT_USER
+
+    username = username_entry_login.get()
+
+    password = password_entry_login.get()
+
+    data = login_user(
+
+        username,
+
+        password
+
+    )
+    log_activity(
+
+    f"{username} logged in"
+
+    )
+
+    if data:
+
+        CURRENT_USER = username
+
+        login_window.destroy()
+
+        refresh_table()
+
+        window.deiconify()
+
+    else:
+
+        messagebox.showerror(
+
+            "Error",
+
+            "Invalid Login"
+
+        )
+
+def register():
+
+    username = username_entry_login.get()
+
+    password = password_entry_login.get()
+
+    success = register_user(
+
+        username,
+
+        password
+
+    )
+
+    if success:
+
+        messagebox.showinfo(
+
+            "Success",
+
+            "Account Created"
+
+        )
+
+    else:
+
+        messagebox.showerror(
+
+            "Error",
+
+            "Username Already Exists"
+
+        )
+
+login_button = Button(
+
+    login_window,
+
+    text="Login",
+
+    command=login,
+
+    width=20
+
+)
+
+button_style(
+
+    login_button,
+
+    "#00c853"
+
+)
+
+login_button.pack(pady=20)
+
+register_button = Button(
+
+    login_window,
+
+    text="Register",
+
+    command=register,
+
+    width=20
+
+)
+
+button_style(
+
+    register_button,
+
+    "#2962ff"
+
+)
+
+register_button.pack(pady=10)
+
+login_window.mainloop()
+
