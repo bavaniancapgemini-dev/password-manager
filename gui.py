@@ -22,6 +22,7 @@ from importer import *
 from notifications import *
 from matrix_effect import *
 from ui_effects import *
+from ai_advisor import *
 
 create_table()
 create_user_table()
@@ -144,6 +145,23 @@ font=(FONT, 20, "bold")
 
 security_score.pack(pady=20)
 
+quick_stats = Label(
+
+    sidebar,
+
+    text=
+    "Weak: 0\nStrong: 0",
+
+    bg=SIDEBAR_COLOR,
+
+    fg="#00ffee",
+
+    font=("Consolas", 14, "bold")
+
+)
+
+quick_stats.pack(pady=10)
+
 clock_label = Label(
 sidebar,
 bg=SIDEBAR_COLOR,
@@ -250,6 +268,11 @@ font=(FONT, 14)
 
 website_entry.grid(row=0, column=1)
 
+website_entry.bind(
+    "<KeyRelease>",
+    lambda e: search_password()
+)
+
 # USERNAME
 
 Label(
@@ -337,6 +360,22 @@ font=(FONT, 18, "bold")
 
 strength_label.pack(pady=10)
 
+advisor_label = Label(
+
+    main,
+
+    text="AI Advisor Ready",
+
+    bg=BG_COLOR,
+
+    fg="#00ffee",
+
+    font=("Consolas", 12, "bold")
+
+)
+
+advisor_label.pack(pady=5)
+
 # =========================
 # TABLE
 # =========================
@@ -348,7 +387,7 @@ bg=BG_COLOR
 
 table_frame.pack(
 fill=BOTH,
-expand=True,
+expand=False,
 padx=20,
 pady=10
 )
@@ -412,7 +451,7 @@ table = ttk.Treeview(
 table_frame,
 columns=columns,
 show="headings",
-height=12
+height=7
 )
 
 for col in columns:
@@ -490,8 +529,81 @@ END,
 
 terminal_output.insert(
 END,
-"[SYSTEM] Threat Level: LOW\n"
+"[SYSTEM] Threat Level: MONITORING\n"
 )
+
+# =========================
+# BUTTONS
+# =========================
+# =========================
+# MODERN BUTTON PANEL v24.0
+# =========================
+
+button_container = Frame(
+    main,
+    bg=BG_COLOR
+)
+
+button_container.pack(pady=20)
+# ROW 1
+top_buttons = Frame(
+button_container,
+bg=BG_COLOR
+)
+
+top_buttons.pack(pady=8)
+
+# ROW 2
+bottom_buttons = Frame(
+button_container,
+bg=BG_COLOR
+)
+
+bottom_buttons.pack(pady=8)
+
+# BUTTON STYLE FUNCTION
+
+def cyber_button(parent, text, command, color):
+    btn = Button(
+        parent,
+        text=text,
+        command=command,
+        bg=color,
+        fg="white",
+        activebackground=color,
+        activeforeground="white",
+        font=("Arial", 11, "bold"),
+        width=18,
+        height=2,
+        bd=0,
+        cursor="hand2"
+    )
+
+    btn.pack(
+        side=LEFT,
+        padx=8
+    )
+
+    def on_enter(e):
+        btn.config(
+            bg="#00ffee",
+            fg="black"
+        )
+
+    def on_leave(e):
+        btn.config(
+            bg=color,
+            fg="white"
+        )
+
+    btn.bind("<Enter>", on_enter)
+    btn.bind("<Leave>", on_leave)
+
+    return btn
+
+# =========================
+# TOP BUTTONS
+# =========================
 
 # =========================
 # FUNCTIONS
@@ -538,6 +650,11 @@ def update_strength(event=None):
             text="Strength: Strong",
             fg=GREEN
         )
+        
+        advice = password_advice(password)
+
+        advisor_label.config(
+    text=f"AI Advisor:\n{advice}")
 
 password_entry.bind("<KeyRelease>", update_strength)
 
@@ -582,6 +699,28 @@ row[5]
 )
 )
 
+weak = 0
+strong = 0
+
+for row in data:
+
+    decrypted = decrypt_password(row[3])
+
+    if len(decrypted) < 8:
+
+        weak += 1
+
+    else:
+
+        strong += 1
+
+quick_stats.config(
+
+    text=
+    f"Weak: {weak}\nStrong: {strong}"
+
+)
+
 stats_count.config(text=str(len(data)))
 
 def save_password():
@@ -612,6 +751,42 @@ def save_password():
     refresh_table()
 
     clear_fields()
+    
+    terminal_output.insert(
+        END,
+        f"[SYSTEM] Saved password for {website}\n"
+    )
+
+    def hacker_mode():
+
+        fake_logs = [
+            "[ACCESS] Bypassing firewall...",
+            "[ACCESS] Injecting packets...",
+            "[ACCESS] Encrypting secure tunnel...",
+            "[ACCESS] Vault protected...",
+            "[ACCESS] Monitoring threats...",
+            "[ACCESS] Scanning dark web..."
+        ]
+
+        import random
+
+        log = random.choice(fake_logs)
+
+        terminal_output.insert(
+            END,
+            log + "\n"
+        )
+
+        terminal_output.see(END)
+
+        window.after(
+            4000,
+            hacker_mode
+        )
+
+    hacker_mode()
+
+    terminal_output.see(END)
 
     messagebox.showinfo(
         "Saved",
@@ -649,6 +824,80 @@ def search_password():
 
 
 def delete_password_gui():
+    selected = table.focus()
+
+    if not selected:
+
+        messagebox.showerror(
+            "Error",
+            "Select a record first"
+        )
+
+        return
+
+    values = table.item(selected, "values")
+
+    old_website = values[0]
+
+    new_website = website_entry.get()
+
+    new_username = username_entry.get()
+
+    new_password = password_entry.get()
+
+    new_category = category_entry.get()
+
+    new_notes = notes_entry.get()
+
+    encrypted = encrypt_password(new_password)
+
+    conn = sqlite3.connect("passwords.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        """
+        UPDATE passwords
+
+        SET website=?,
+            username=?,
+            password=?,
+            category=?,
+            notes=?
+
+        WHERE website=? AND owner=?
+        """,
+
+        (
+            new_website,
+            new_username,
+            encrypted,
+            new_category,
+            new_notes,
+            old_website,
+            CURRENT_USER
+        )
+
+    )
+
+    conn.commit()
+
+    conn.close()
+
+    terminal_output.insert(
+        END,
+        f"[SYSTEM] Updated password for {new_website}\n"
+    )
+
+    refresh_table()
+
+    clear_fields()
+
+    messagebox.showinfo(
+        "Updated",
+        "Password Updated Successfully"
+    )
 
     website = website_entry.get()
 
@@ -700,6 +949,65 @@ def copy_password():
         messagebox.showinfo("Copied", "Password Copied")
 
 def toggle_password():
+    
+    lockdown_mode = False
+
+def vault_lockdown():
+    
+    fullscreen = False
+
+def toggle_fullscreen():
+
+    global fullscreen
+
+    fullscreen = not fullscreen
+
+    window.attributes(
+        "-fullscreen",
+        fullscreen
+    )
+
+    global lockdown_mode
+
+    lockdown_mode = not lockdown_mode
+
+    for item in table.get_children():
+
+        values = list(
+            table.item(item, "values")
+        )
+
+        if lockdown_mode:
+
+            values[2] = "████████"
+
+        else:
+
+            values[2] = decrypt_password(
+                search_password_db(
+                    values[0],
+                    CURRENT_USER
+                )[0][3]
+            )
+
+        table.item(
+            item,
+            values=values
+        )
+
+    if lockdown_mode:
+
+        terminal_output.insert(
+            END,
+            "[SYSTEM] VAULT LOCKDOWN ENABLED\n"
+        )
+
+    else:
+
+        terminal_output.insert(
+            END,
+            "[SYSTEM] VAULT LOCKDOWN DISABLED\n"
+        )
 
     global show_password
 
@@ -774,96 +1082,43 @@ file.read()
 )
 
     except:
-
         text.insert(
 END,
 "No activity logs."
 )
-
-# =========================
-# BUTTONS
-# =========================
-# =========================
-# MODERN BUTTON PANEL v24.0
-# =========================
-
-button_container = Frame(
-main,
-bg=BG_COLOR
-)
-
-button_container.pack
-pady=20
-# ROW 1
-top_buttons = Frame(
-button_container,
-bg=BG_COLOR
-)
-
-top_buttons.pack(pady=8)
-
-# ROW 2
-bottom_buttons = Frame(
-button_container,
-bg=BG_COLOR
-)
-
-bottom_buttons.pack(pady=8)
-
-# BUTTON STYLE FUNCTION
-
-def cyber_button(parent, text, command, color):
-    btn = Button(
-        parent,
-        text=text,
-        command=command,
-        bg=color,
-        fg="white",
-        activebackground=color,
-        activeforeground="white",
-        font=("Arial", 11, "bold"),
-        width=18,
-        height=2,
-        bd=0,
-        cursor="hand2"
-    )
-
-    btn.pack(
-        side=LEFT,
-        padx=8
-    )
-
-    return btn
-
-# =========================
+        
+        # =========================
 # TOP BUTTONS
 # =========================
 
 cyber_button(
-top_buttons,
-"💾 Save",
-save_password,
-"#00c853"
+    top_buttons,
+    "💾 Save",
+    save_password,
+    "#00c853"
 )
 
 cyber_button(
-top_buttons,
-"🔄 Refresh",
-refresh_table,
-"#2962ff"
+    top_buttons,
+    "🔄 Refresh",
+    refresh_table,
+    "#2962ff"
 )
 
 cyber_button(
-top_buttons,
-"🔍 Search",
-search_password,
-"#ff9100"
+    top_buttons,
+    "🔍 Search",
+    search_password,
+    "#ff9100"
 )
 
-# =========================
-# BOTTOM BUTTONS
-# =========================
-
+cyber_button(
+    top_buttons,
+    "❌ Delete",
+    delete_password_gui,
+    "#ff1744"
+)
+        
 cyber_button(
 bottom_buttons,
 "⚡ Generate",
@@ -898,13 +1153,34 @@ bottom_buttons,
 view_activity,
 "#00bfa5"
 )
-
 cyber_button(
-top_buttons,
-"❌ Delete",
-delete_password_gui,
-"#ff1744"
+    bottom_buttons,
+    "🔒 Lockdown",
+    vault_lockdown,
+    "#ff0033"
 )
+cyber_button(
+    bottom_buttons,
+    "🖥 Fullscreen",
+    toggle_fullscreen,
+    "#00b0ff"
+)
+
+def auto_logout():
+    messagebox.showwarning(
+        "Session Expired",
+        "Auto logout activated"
+    )
+    window.destroy()
+
+window.after(
+    3600000,
+    auto_logout
+)
+
+# =========================
+# BOTTOM BUTTONS
+# =========================
 
 # =========================
 # LOGIN SYSTEM
