@@ -1,225 +1,257 @@
-# 🔐 Password Manager
+# CYBER VAULT v26.0 — README.md
 
-A secure and efficient Password Manager application built to safely store, manage, and organize user credentials. This project demonstrate concepts of authentication, encryption, data validation, secure storage, and modular backend architecture.
+## 🔥 CYBER VAULT v26.0
 
----
-
-## 🚀 Features
-
-- Secure Password Storage
-- Password Encryption
-- Add Passwords
-- Update Passwords
-- Delete Passwords
-- Search Saved Credentials
-- Authentication System
-- Input Validation
-- Secure Data Handling
-- Modular Data Structure
-- Easy Credential Management
+Advanced Cyberpunk Password Manager built with Python + Tkinter.
 
 ---
 
-## 🛠️ Tech Stack
+# 🚀 FEATURES
 
-- Python
-- SQLite / MySQL
-- File Handling
-- Object-Oriented Programming
-- Encryption Libraries
-- Hashing Techniques
+✅ AES Password Encryption
+✅ User Login & Registration
+✅ Password Generator
+✅ Password Strength Analyzer
+✅ Search Passwords
+✅ Delete Passwords
+✅ Activity Logs
+✅ Matrix Background Animation
+✅ Cyberpunk UI
+✅ CSV Import
+✅ Security Score System
+✅ Live Clock
+✅ Cyber Terminal
+✅ AI Password Advisor
+✅ Fullscreen Mode
+✅ Vault Lockdown Mode
+✅ Auto Logout System
+✅ Double Click Record Selection
+✅ Notifications System
 
 ---
 
-## 📂 Project Structure
+# 📂 PROJECT STRUCTURE
 
-```bash
-password-managee/
-|
-├── main.py
-├── auth.py
+```plaintext
+password-manager/
+│
+├── gui.py
 ├── database.py
-├── passwords.py
-├── validations.py
-├── utils.py
-├── encryption.py
-├── README.md
+├── generator.py
+├── security.py
+├── analyzer.py
+├── backup.py
+├── stats.py
+├── config.py
+├── cyber_theme.py
+├── activity.py
+├── health.py
+├── importer.py
+├── notifications.py
+├── matrix_effect.py
+├── ui_effects.py
+├── user_auth.py
+├── ai_advisor.py
+│
+├── passwords.db
+├── activity.log
+├── icon.ico
+│
+├── backups/
+│
+└── README.md
 ```
 
 ---
 
-## 📌 Module Overview
+# ⚙️ INSTALLATION
 
-### `main.py`
-Acts as the main entry point of the application.
+## 1️⃣ Install Python
 
-### `auth.py`
-Handles user authentication, login, signup, and access verification.
+Download Python:
 
-### `database.py`
-Manages database connection, queries, and secure data storage.
+* https://www.python.org/downloads/
 
-### `passwords.py`
-Handles adding, updating, deleting, and managing saved credentials.
+During installation:
 
-### `validations.py`
-Contains validation logic for usernames, passwords, and user inputs.
+✅ CHECK:
 
-### `utils.py`
-Reusable helper functions used throughout the project.
-
-### `encryption.py`
-Handles encryption and decryption of stored passwords.
+```plaintext
+Add Python to PATH
+```
 
 ---
 
-## 🔒 Security Features
+# 2️⃣ Install Required Libraries
 
-- Password Encryption
-- Secure Authentication Workflow
-- Password Hashing
-- Input Validation
-- Deplicate Entry Prevention
-- Protected Credential Storage
-
----
-
-## ⚡ Installation
-
-Clone the repository:
+Open terminal inside project folder:
 
 ```bash
-git clone https://github.com/password-manager/password-manager.git
+pip install pyperclip cryptography
 ```
 
-Move into the project directory:
+---
+
+# ▶️ RUN PROJECT
 
 ```bash
-cd password-manager
+python gui.py
 ```
 
-Run the project:
+---
+
+# 🔐 DEFAULT LOGIN
+
+Create account using REGISTER button.
+
+Then login.
+
+---
+
+# 🛠 GITHUB UPLOAD
+
+## Initialize Git
 
 ```bash
-Python main.py
+git init
 ```
 
 ---
 
-## 🧪Example Workflow
+## Add Files
 
-1. User creates an account
-2. User logs into the system
-3. Credentials are securely added
-4. Passwords are encrypted before storage
-5. User can manage stored credentials safely
+```bash
+git add .
+```
 
 ---
 
-## 📈 Future Improvements
+## Commit
 
-- Password Strength Analyzer
-- Password Generator
-- Two-Factor Authentication (2FA)
-- Cloud Synchronization
-- Browser Extension
-- Auto-Fill Support
-- Biometric Authentication
-- Secure Backup & Restore
-- Dark Mode Interface
+```bash
+git commit -m "CYBER VAULT v26.0"
+```
 
 ---
 
-## 🎯 Learning Outcomes
+## Connect Repository
 
-This project helped in understanding:
-
-- Authentication Systems
-- Encryption Concepts
-- Secure Password Handling
-- Database Operations
-- Validation Techniques
-- Modular Programming
-- Backend Security Practices
-- Application Architecture
-
----
-
-## 📊 Possible Enhancements
-
-- AES Encryption
-- JWT Authentication
-- Multi-User Support
-- Activity Logs
-- Security Notifications
-- Password Expiry Alerts
-- API Integration
-- Dashboard Analytics
-
----
-
-## 📸 Screenshots
-
-Add screenshots of:
-- Login Page
-- Password Vault
-- Credential Form
-- Database Tables
-- Encryption Workflow
+```bash
+git remote add origin YOUR_GITHUB_REPO_LINK
+```
 
 Example:
 
-```md
-![Dashboard Screenshot](images/dashboard.png)
+```bash
+git remote add origin https://github.com/yourname/password-manager.git
 ```
 
 ---
 
-## 🎥 Demo
+## Push
 
-Add deployment link or demo video here.
-
----
-
-## 🏗️ Architecture
-
-The application follows a modular backend structure where authentication, encryption, validation, database operations, and credential management are separated into independent modules for better scalability and maintainability.
+```bash
+git branch -M main
+git push -u origin main
+```
 
 ---
 
-## 🌟 Highlights
+# 🧠 IMPORTANT FIXES
 
-- Secure Credential Storage
-- Clean and Readable Code
-- Beginner-Friendly Architecture
-- Real-World Security Consepts
-- Easily Extendable System
-- Modular Design
+## If buttons are not showing
 
----
+The button panel MUST be BELOW all function definitions.
 
-## 🤝 Contributing
+Correct order:
 
-Contributions are welcome. Feel free to fork the repository and submit pull requests.
-
----
-
-## 📜 License
-
-This project is licensed under the MIT License.
+```plaintext
+Functions
+↓
+Buttons
+↓
+Login System
+↓
+window.mainloop()
+```
 
 ---
 
-## 👨‍💻Author
+# 🧩 COMMON ERRORS
 
-Developed by Bavani.Ch
+## ❌ NameError: save_password not defined
 
-GitHub: https://github.com/password-manager
+Cause:
+
+Buttons are above functions.
+
+Fix:
+
+Move button section BELOW all functions.
 
 ---
 
-## ⭐ Support
+## ❌ Invalid Syntax
 
-If you found this project useful, consider giving it a star on GitHub.
+Wrong:
 
+```python
+window.title(f"{APP_NAME} {"v24.0"}")
+```
 
+Correct:
+
+```python
+window.title(f"{APP_NAME} v26.0")
+```
+
+---
+
+# 🎨 UI COLORS
+
+| Element    | Color   |
+| ---------- | ------- |
+| Background | #000814 |
+| Sidebar    | #001233 |
+| Cyan       | #00ffee |
+| Green      | #00ff66 |
+| Red        | #ff1744 |
+
+---
+
+# 🔥 NEXT VERSION IDEAS (v27.0)
+
+✅ Export Passwords
+✅ QR Login
+✅ Fingerprint Authentication
+✅ Cloud Sync
+✅ Dark Web Leak Scanner
+✅ Voice Assistant
+✅ AI Threat Detection
+✅ Animated Dashboard Charts
+
+---
+
+# 👨‍💻 BUILT WITH
+
+* Python
+* Tkinter
+* SQLite
+* Cryptography
+* Cyberpunk Design
+
+---
+
+# ⚠️ DISCLAIMER
+
+This project is for educational purposes only.
+
+Use responsibly.
+
+---
+
+# 🏁 VERSION
+
+```plaintext
+CYBER VAULT v26.0
+```
