@@ -1,7 +1,10 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter.filedialog import askopenfilename
+
 from datetime import datetime
+
 import pyperclip
 
 from user_auth import *
@@ -15,13 +18,15 @@ from config import *
 from cyber_theme import *
 from activity import *
 from health import *
+from importer import *
+from notifications import *
+from matrix_effect import *
+from ui_effects import *
 
 create_table()
-
 create_user_table()
 
 CURRENT_USER = ""
-
 show_password = False
 
 window = Tk()
@@ -32,385 +37,359 @@ window.geometry("1600x900")
 
 window.config(bg=BG_COLOR)
 
-window.iconbitmap("icon.ico")
+try:
+    window.iconbitmap("icon.ico")
+except:
+    pass
+
+window.withdraw()
 
 sidebar = Frame(
-
     window,
-
     bg=SIDEBAR_COLOR,
-
     width=260
-
 )
 
 sidebar.pack(
-
     side=LEFT,
-
     fill=Y
-
 )
 
 sidebar.pack_propagate(False)
 
 logo = Label(
-
     sidebar,
-
     text="CYBER\nVAULT",
-
     bg=SIDEBAR_COLOR,
-
     fg=CYAN,
-
     font=(FONT, 34, "bold")
-
 )
 
-logo.pack(pady=40)
+logo.pack(pady=30)
+
+user_panel = Label(
+    sidebar,
+    text="USER",
+    bg=SIDEBAR_COLOR,
+    fg="white",
+    font=(FONT, 16, "bold")
+)
+
+user_panel.pack(pady=20)
 
 stats_label = Label(
-
     sidebar,
-
     text="Stored Passwords",
-
     bg=SIDEBAR_COLOR,
-
     fg="white",
-
     font=(FONT, 18, "bold")
-
 )
 
 stats_label.pack(pady=10)
 
 stats_count = Label(
-
     sidebar,
-
     text="0",
-
     bg=SIDEBAR_COLOR,
-
     fg="white",
-
     font=(FONT, 24, "bold")
-
 )
 
 stats_count.pack()
 
-clock_label = Label(
-
-    sidebar,
-
-    bg=SIDEBAR_COLOR,
-
-    fg=GREEN,
-
-    font=(FONT, 28, "bold")
-
-)
-
-clock_label.pack(pady=80)
-
-terminal = Text(
-
-    sidebar,
-
-    height=12,
-
-    width=28,
-
-    bg="black",
-
-    fg=GREEN,
-
-    font=("Consolas", 10)
-
-)
-
-terminal.pack(pady=20)
 security_score = Label(
-
     sidebar,
-
     text="Security Score\n100%",
-
     bg=SIDEBAR_COLOR,
-
     fg=GREEN,
-
     font=(FONT, 20, "bold")
-
 )
 
 security_score.pack(pady=20)
 
-terminal.insert(
-
-    END,
-
-    "[ SYSTEM ONLINE ]\n"
-
+clock_label = Label(
+    sidebar,
+    bg=SIDEBAR_COLOR,
+    fg=GREEN,
+    font=(FONT, 26, "bold")
 )
 
-terminal.insert(
+clock_label.pack(pady=30)
 
-    END,
-
-    "[ VAULT ENCRYPTED ]\n"
-
+notification_box = Text(
+    sidebar,
+    height=10,
+    width=28,
+    bg="#111",
+    fg="orange",
+    font=("Consolas", 10)
 )
 
-terminal.insert(
+notification_box.pack(pady=20)
 
-    END,
-
-    "[ SECURITY ACTIVE ]\n"
-
-)
-
-terminal.insert(
-
-    END,
-
-    "[ FIREWALL ENABLED ]\n"
-
-)
-
-terminal.insert(
-
-    END,
-
-    "[ ACCESS GRANTED ]\n"
-
-)
-
-terminal.config(state=DISABLED)
+# =========================
+# MAIN AREA
+# =========================
 
 main = Frame(
-
     window,
-
     bg=BG_COLOR
-
 )
 
 main.pack(
-
     side=LEFT,
-
     fill=BOTH,
-
     expand=True
+)
 
+matrix_canvas = Canvas(
+
+    main,
+
+    bg="#000814",
+
+    highlightthickness=0
+
+)
+
+matrix_canvas.place(
+
+    x=0,
+    y=0,
+
+    relwidth=1,
+    relheight=1
+
+)
+
+start_matrix(
+    matrix_canvas,
+    1400,
+    900
 )
 
 title = Label(
-
     main,
-
     text="Password Manager Dashboard",
-
     bg=BG_COLOR,
-
     fg="white",
-
-    font=(FONT, 36, "bold")
-
+    font=(FONT, 30, "bold")
 )
 
-title.pack(pady=25)
+title.pack(pady=20)
+
+# =========================
+# FORM
+# =========================
 
 form = Frame(
-
     main,
-
     bg=BG_COLOR
-
 )
 
 form.pack(pady=10)
 
-website_label = Label(
+# WEBSITE
 
+Label(
     form,
-
     text="Website",
-
     bg=BG_COLOR,
-
     fg="white",
-
-    font=(FONT, 16)
-
-)
-
-website_label.grid(row=0, column=0, pady=10, padx=10)
+    font=(FONT, 14)
+).grid(row=0, column=0, padx=10, pady=10)
 
 website_entry = Entry(
-
     form,
-
     width=40,
-
-    font=(FONT, 16)
-
+    font=(FONT, 14)
 )
 
-website_entry.grid(row=0, column=1, pady=10)
+website_entry.grid(row=0, column=1)
 
-username_label = Label(
+# USERNAME
 
+Label(
     form,
-
     text="Username",
-
     bg=BG_COLOR,
-
     fg="white",
-
-    font=(FONT, 16)
-
-)
-
-username_label.grid(row=1, column=0, pady=10)
+    font=(FONT, 14)
+).grid(row=1, column=0, padx=10, pady=10)
 
 username_entry = Entry(
-
     form,
-
     width=40,
-
-    font=(FONT, 16)
-
+    font=(FONT, 14)
 )
 
-username_entry.grid(row=1, column=1, pady=10)
+username_entry.grid(row=1, column=1)
 
-password_label = Label(
+# PASSWORD
 
+Label(
     form,
-
     text="Password",
-
     bg=BG_COLOR,
-
     fg="white",
-
-    font=(FONT, 16)
-
-)
-
-password_label.grid(row=2, column=0, pady=10)
+    font=(FONT, 14)
+).grid(row=2, column=0, padx=10, pady=10)
 
 password_entry = Entry(
-
     form,
-
     width=40,
-
     show="*",
-
-    font=(FONT, 16)
-
+    font=(FONT, 14)
 )
 
-password_entry.grid(row=2, column=1, pady=10)
+password_entry.grid(row=2, column=1)
 
-category_label = Label(
+# CATEGORY
 
+Label(
     form,
-
     text="Category",
-
     bg=BG_COLOR,
-
     fg="white",
-
-    font=(FONT, 16)
-
-)
-
-category_label.grid(row=3, column=0, pady=10)
+    font=(FONT, 14)
+).grid(row=3, column=0, padx=10, pady=10)
 
 category_entry = Entry(
-
     form,
-
     width=40,
-
-    font=(FONT, 16)
-
+    font=(FONT, 14)
 )
 
-category_entry.grid(row=3, column=1, pady=10)
-
+category_entry.grid(row=3, column=1)
 
 # NOTES
 
-notes_label = Label(
-
+Label(
     form,
-
     text="Notes",
-
     bg=BG_COLOR,
-
     fg="white",
-
-    font=(FONT, 16)
-
-)
-
-notes_label.grid(row=4, column=0, pady=10)
+    font=(FONT, 14)
+).grid(row=4, column=0, padx=10, pady=10)
 
 notes_entry = Entry(
-
     form,
-
     width=40,
-
-    font=(FONT, 16)
-
+    font=(FONT, 14)
 )
 
-notes_entry.grid(row=4, column=1, pady=10)
+notes_entry.grid(row=4, column=1)
+
+# =========================
+# STRENGTH LABEL
+# =========================
 
 strength_label = Label(
-
     main,
-
-    text="Strength: ",
-
+    text="Strength:",
     bg=BG_COLOR,
-
     fg="white",
-
-    font=(FONT, 20, "bold")
-
+    font=(FONT, 18, "bold")
 )
 
 strength_label.pack(pady=10)
 
+# =========================
+# TABLE
+# =========================
+
+table_frame = Frame(
+    main,
+    bg=BG_COLOR
+)
+
+table_frame.pack(
+    fill=BOTH,
+    expand=True,
+    padx=20,
+    pady=20
+)
+
+columns = (
+    "Website",
+    "Username",
+    "Password",
+    "Category",
+    "Notes"
+)
+
+style = ttk.Style()
+
+style.theme_use("clam")
+
+style.configure(
+
+    "Treeview",
+
+    background="#001233",
+
+    foreground="cyan",
+
+    fieldbackground="#001233",
+
+    rowheight=35,
+
+    font=("Consolas", 11)
+
+)
+
+style.configure(
+
+    "Treeview.Heading",
+
+    background="#001845",
+
+    foreground="white",
+
+    font=("Arial", 12, "bold")
+
+)
+
+table = ttk.Treeview(
+    table_frame,
+    columns=columns,
+    show="headings",
+    height=12
+)
+
+for col in columns:
+
+    table.heading(col, text=col)
+
+    table.column(col, width=220)
+
+table.pack(
+    fill=BOTH,
+    expand=True
+)
+
+# =========================
+# FUNCTIONS
+# =========================
+
 def update_clock():
 
-    time_now = datetime.now().strftime(
-        "%H:%M:%S"
-    )
+    now = datetime.now().strftime("%H:%M:%S")
 
-    clock_label.config(
-        text=time_now
-    )
+    clock_label.config(text=now)
 
-    window.after(
-        1000,
-        update_clock
-    )
+    window.after(1000, update_clock)
 
+def check_strength(password):
+
+    if len(password) < 6:
+        return "Weak"
+
+    elif len(password) < 10:
+        return "Medium"
+
+    else:
+        return "Strong"
 
 def update_strength(event=None):
 
@@ -421,42 +400,25 @@ def update_strength(event=None):
     if strength == "Weak":
 
         strength_label.config(
-
             text="Strength: Weak",
-
             fg=RED
-
         )
 
     elif strength == "Medium":
 
         strength_label.config(
-
             text="Strength: Medium",
-
             fg=YELLOW
-
         )
 
     else:
 
         strength_label.config(
-
             text="Strength: Strong",
-
             fg=GREEN
-
         )
 
-
-password_entry.bind(
-
-    "<KeyRelease>",
-
-    update_strength
-
-)
-
+password_entry.bind("<KeyRelease>", update_strength)
 
 def refresh_table():
 
@@ -464,107 +426,64 @@ def refresh_table():
 
         table.delete(item)
 
-    data = view_passwords_db(
-        CURRENT_USER
-    )
+    data = view_passwords_db(CURRENT_USER)
 
     analysis = analyze_passwords(data)
 
     security_score.config(
-
         text=f"Security Score\n{analysis['score']}%"
-
     )
 
-    if analysis["score"] < 50:
+    notifications_list = generate_notifications(analysis)
 
-        security_score.config(
-        fg=RED
-        )
+    notification_box.delete(1.0, END)
 
-    elif analysis["score"] < 80:
+    for note in notifications_list:
 
-        security_score.config(
-        fg=YELLOW
-        )
-
-    else:
-
-        security_score.config(
-        fg=GREEN
+        notification_box.insert(
+            END,
+            note + "\n"
         )
 
     for row in data:
 
-        decrypted = decrypt_password(
-            row[3]
-        )
+        decrypted = decrypt_password(row[3])
 
         table.insert(
-
             "",
-
             END,
-
             values=(
-
                 row[1],
-
                 row[2],
-
                 decrypted,
-
                 row[4],
-
                 row[5]
-
             )
-
         )
 
-    stats_count.config(
-
-        text=str(len(data))
-
-    )
-
+    stats_count.config(text=str(len(data)))
 
 def save_password():
 
     website = website_entry.get()
-
     username = username_entry.get()
-
     password = password_entry.get()
-
     category = category_entry.get()
-
     notes = notes_entry.get()
 
-    encrypted = encrypt_password(
-        password
-    )
-    log_activity(
-
-    f"{CURRENT_USER} saved password for {website}"
-
-    )
-    
+    encrypted = encrypt_password(password)
 
     save_password_db(
-
         website,
-
         username,
-
         encrypted,
-
         category,
-
         notes,
-
         CURRENT_USER
+    )
 
+    log_activity(
+        f"{CURRENT_USER} saved password for {website}"
     )
 
     create_backup()
@@ -574,495 +493,383 @@ def save_password():
     clear_fields()
 
     messagebox.showinfo(
-
         "Saved",
-
-        "Password Saved Successfully"
-
+        "Password Saved"
     )
-
 
 def search_password():
 
     website = website_entry.get()
 
     data = search_password_db(
-
         website,
-
         CURRENT_USER
-
     )
 
     for item in table.get_children():
-
         table.delete(item)
 
     for row in data:
 
-        decrypted = decrypt_password(
-            row[3]
-        )
+        decrypted = decrypt_password(row[3])
 
         table.insert(
-
             "",
-
             END,
-
             values=(
-
                 row[1],
-
                 row[2],
-
                 decrypted,
-
                 row[4],
-
                 row[5]
-
             )
-
         )
-
 
 def delete_password_gui():
 
     website = website_entry.get()
 
     delete_password_db(
-
         website,
-
         CURRENT_USER
-
     )
+
     log_activity(
-
-    f"{CURRENT_USER} deleted password for {website}"
-
+        f"{CURRENT_USER} deleted password for {website}"
     )
 
     refresh_table()
 
-    messagebox.showinfo(
-
-        "Deleted",
-
-        "Password Deleted"
-
-    )
-
-
 def generate_password_gui():
 
-    password_entry.delete(
-        0,
-        END
-    )
-
-    new_password = generate_password()
+    password_entry.delete(0, END)
 
     password_entry.insert(
         0,
-        new_password
+        generate_password()
     )
 
     update_strength()
 
-
 def clear_fields():
 
-    website_entry.delete(
-        0,
-        END
-    )
-
-    username_entry.delete(
-        0,
-        END
-    )
-
-    password_entry.delete(
-        0,
-        END
-    )
-
-    category_entry.delete(
-        0,
-        END
-    )
-
-    notes_entry.delete(
-        0,
-        END
-    )
-
+    website_entry.delete(0, END)
+    username_entry.delete(0, END)
+    password_entry.delete(0, END)
+    category_entry.delete(0, END)
+    notes_entry.delete(0, END)
 
 def copy_password():
 
-    pyperclip.copy(
-
-        password_entry.get()
-
-    )
+    pyperclip.copy(password_entry.get())
 
     messagebox.showinfo(
-
         "Copied",
-
         "Password Copied"
-
     )
-
 
 def toggle_password():
 
     global show_password
 
-    if show_password == False:
+    if show_password:
 
-        password_entry.config(
-            show=""
-        )
-
-        show_password = True
-
-    else:
-
-        password_entry.config(
-            show="*"
-        )
+        password_entry.config(show="*")
 
         show_password = False
 
-button_frame = Frame(
+    else:
 
-    main,
+        password_entry.config(show="")
 
-    bg=BG_COLOR
+        show_password = True
 
-)
+def select_record(event):
+
+    selected = table.focus()
+
+    values = table.item(selected, "values")
+
+    if values:
+
+        clear_fields()
+
+        website_entry.insert(0, values[0])
+        username_entry.insert(0, values[1])
+        password_entry.insert(0, values[2])
+        category_entry.insert(0, values[3])
+        notes_entry.insert(0, values[4])
+
+table.bind("<Double-1>", select_record)
+
+def import_passwords():
+
+    filepath = askopenfilename(
+        filetypes=[("CSV Files", "*.csv")]
+    )
+
+    if filepath:
+
+        import_csv(
+            filepath,
+            CURRENT_USER
+        )
+
+        refresh_table()
 
 def view_activity():
 
     activity_window = Toplevel()
 
-    activity_window.title(
-        "Activity Logs"
-    )
+    activity_window.title("Activity Logs")
 
-    activity_window.geometry(
-        "700x500"
-    )
+    activity_window.geometry("700x500")
 
     text = Text(
-
         activity_window,
-
         bg="black",
-
         fg="lime",
-
         font=("Consolas", 10)
-
     )
 
-    text.pack(
-        fill=BOTH,
-        expand=True
-    )
+    text.pack(fill=BOTH, expand=True)
 
     try:
 
-        with open(
-            "activity.log",
-            "r"
-        ) as file:
-
-            logs = file.read()
+        with open("activity.log", "r") as file:
 
             text.insert(
                 END,
-                logs
+                file.read()
             )
 
     except:
 
         text.insert(
             END,
-            "No activity logs yet."
+            "No activity logs."
         )
 
-activity_button = Button(
+# =========================
+# BUTTONS
+# =========================
+# =========================
+# MODERN BUTTON PANEL v23.0
+# =========================
 
-    button_frame,
-
-    text="Activity Logs",
-
-    command=view_activity,
-
-    width=18
-
+button_container = Frame(
+    main,
+    bg=BG_COLOR
 )
 
-button_style(
+button_container.pack(pady=20)
 
-    activity_button,
-
-    "#00bfa5"
-
+top_buttons = Frame(
+    button_container,
+    bg=BG_COLOR
 )
 
-activity_button.grid(
-    row=2,
-    column=2,
-    pady=10
+top_buttons.pack(pady=10)
+
+bottom_buttons = Frame(
+    button_container,
+    bg=BG_COLOR
 )
 
-button_frame.pack(pady=20)
+bottom_buttons.pack(pady=10)
 
+# =========================
+# BUTTON STYLE FUNCTION
+# =========================
 
-save_button = Button(
+def cyber_button(parent, text, command, color):
 
-    button_frame,
+    btn = Button(
 
-    text="Save Password",
+        parent,
 
-    command=save_password,
+        text=text,
 
-    width=18
+        command=command,
 
-)
+        bg=color,
 
-button_style(
+        fg="white",
 
-    save_button,
+        activebackground=color,
+
+        activeforeground="white",
+
+        font=("Arial", 12, "bold"),
+
+        width=20,
+
+        height=2,
+
+        relief=FLAT,
+
+        cursor="hand2",
+
+        bd=0
+
+    )
+
+    def on_enter(e):
+
+        btn.config(
+            bg="#00ffee",
+            fg="black"
+        )
+
+    def on_leave(e):
+
+        btn.config(
+            bg=color,
+            fg="white"
+        )
+
+    btn.bind("<Enter>", on_enter)
+
+    btn.bind("<Leave>", on_leave)
+
+    return btn
+
+# =========================
+# TOP ROW BUTTONS
+# =========================
+
+save_btn = cyber_button(
+
+    top_buttons,
+
+    "💾 Save Password",
+
+    save_password,
 
     "#00c853"
 
 )
 
-save_button.grid(row=0, column=0, padx=10, pady=10)
+save_btn.grid(row=0, column=0, padx=10, pady=10)
 
+refresh_btn = cyber_button(
 
-view_button = Button(
+    top_buttons,
 
-    button_frame,
+    "🔄 Refresh",
 
-    text="Refresh Table",
-
-    command=refresh_table,
-
-    width=18
-
-)
-
-button_style(
-
-    view_button,
+    refresh_table,
 
     "#2962ff"
 
 )
 
-view_button.grid(row=0, column=1, padx=10)
+refresh_btn.grid(row=0, column=1, padx=10, pady=10)
 
+search_btn = cyber_button(
 
-search_button = Button(
+    top_buttons,
 
-    button_frame,
+    "🔍 Search",
 
-    text="Search Password",
-
-    command=search_password,
-
-    width=18
-
-)
-
-button_style(
-
-    search_button,
+    search_password,
 
     "#ff9100"
 
 )
 
-search_button.grid(row=0, column=2, padx=10)
+search_btn.grid(row=0, column=2, padx=10, pady=10)
 
+delete_btn = cyber_button(
 
-delete_button = Button(
+    top_buttons,
 
-    button_frame,
+    "❌ Delete",
 
-    text="Delete Password",
-
-    command=delete_password_gui,
-
-    width=18
-
-)
-
-button_style(
-
-    delete_button,
+    delete_password_gui,
 
     "#ff1744"
 
 )
 
-delete_button.grid(row=1, column=0, padx=10, pady=10)
+delete_btn.grid(row=1, column=0, padx=10, pady=10)
 
+generate_btn = cyber_button(
 
-generate_button = Button(
+    top_buttons,
 
-    button_frame,
+    "⚡ Generate",
 
-    text="Generate Password",
-
-    command=generate_password_gui,
-
-    width=18
-
-)
-
-button_style(
-
-    generate_button,
+    generate_password_gui,
 
     "#aa00ff"
 
 )
 
-generate_button.grid(row=1, column=1, padx=10)
+generate_btn.grid(row=1, column=1, padx=10, pady=10)
 
+copy_btn = cyber_button(
 
-copy_button = Button(
+    top_buttons,
 
-    button_frame,
+    "📋 Copy",
 
-    text="Copy Password",
-
-    command=copy_password,
-
-    width=18
-
-)
-
-button_style(
-
-    copy_button,
+    copy_password,
 
     "#00b8d4"
 
 )
 
-copy_button.grid(row=1, column=2, padx=10)
+copy_btn.grid(row=1, column=2, padx=10, pady=10)
 
+# =========================
+# BOTTOM ROW BUTTONS
+# =========================
 
-show_button = Button(
+toggle_btn = cyber_button(
 
-    button_frame,
+    bottom_buttons,
 
-    text="Show / Hide",
+    "👁 Show / Hide",
 
-    command=toggle_password,
-
-    width=18
-
-)
-
-button_style(
-
-    show_button,
+    toggle_password,
 
     "#455a64"
 
 )
 
-show_button.grid(row=2, column=1, pady=10)
+toggle_btn.grid(row=0, column=0, padx=10, pady=10)
 
-table_frame = Frame(
+import_btn = cyber_button(
 
-    main,
+    bottom_buttons,
 
-    bg=BG_COLOR
+    "📂 Import CSV",
 
-)
+    import_passwords,
 
-table_frame.pack(
-
-    fill=BOTH,
-
-    expand=True,
-
-    padx=30,
-
-    pady=20
+    "#7c4dff"
 
 )
 
-columns = (
+import_btn.grid(row=0, column=1, padx=10, pady=10)
 
-    "Website",
+activity_btn = cyber_button(
 
-    "Username",
+    bottom_buttons,
 
-    "Password",
+    "🧠 Activity Logs",
 
-    "Category",
+    view_activity,
 
-    "Notes"
-
-)
-
-table = ttk.Treeview(
-
-    table_frame,
-
-    columns=columns,
-
-    show="headings",
-
-    height=12
+    "#00bfa5"
 
 )
 
-for col in columns:
-
-    table.heading(
-
-        col,
-
-        text=col
-
-    )
-
-    table.column(
-
-        col,
-
-        width=220
-
-    )
-
-table.pack(
-
-    fill=BOTH,
-
-    expand=True
-
-)
-
-refresh_table()
-
-update_clock()
-
-window.mainloop()
-
-window.withdraw()
+activity_btn.grid(row=0, column=2, padx=10, pady=10)
+# =========================
+# LOGIN SYSTEM
+# =========================
 
 login_window = Toplevel()
 
@@ -1072,76 +879,43 @@ login_window.geometry("500x500")
 
 login_window.config(bg=BG_COLOR)
 
-login_title = Label(
-
+Label(
     login_window,
-
     text="CYBER VAULT",
-
     bg=BG_COLOR,
-
     fg=CYAN,
-
     font=(FONT, 30, "bold")
+).pack(pady=40)
 
-)
-
-login_title.pack(pady=40)
-
-username_label = Label(
-
+Label(
     login_window,
-
     text="Username",
-
     bg=BG_COLOR,
-
     fg="white",
-
     font=(FONT, 14)
-
-)
-
-username_label.pack(pady=10)
+).pack(pady=10)
 
 username_entry_login = Entry(
-
     login_window,
-
     width=30,
-
     font=(FONT, 14)
-
 )
 
 username_entry_login.pack(pady=10)
 
-password_label = Label(
-
+Label(
     login_window,
-
     text="Password",
-
     bg=BG_COLOR,
-
     fg="white",
-
     font=(FONT, 14)
-
-)
-
-password_label.pack(pady=10)
+).pack(pady=10)
 
 password_entry_login = Entry(
-
     login_window,
-
     width=30,
-
     show="*",
-
     font=(FONT, 14)
-
 )
 
 password_entry_login.pack(pady=10)
@@ -1155,21 +929,21 @@ def login():
     password = password_entry_login.get()
 
     data = login_user(
-
         username,
-
         password
-
-    )
-    log_activity(
-
-    f"{username} logged in"
-
     )
 
     if data:
 
         CURRENT_USER = username
+
+        user_panel.config(
+            text=f"USER\n{CURRENT_USER}"
+        )
+
+        log_activity(
+            f"{username} logged in"
+        )
 
         login_window.destroy()
 
@@ -1180,11 +954,8 @@ def login():
     else:
 
         messagebox.showerror(
-
             "Error",
-
             "Invalid Login"
-
         )
 
 def register():
@@ -1194,76 +965,67 @@ def register():
     password = password_entry_login.get()
 
     success = register_user(
-
         username,
-
         password
-
     )
 
     if success:
 
         messagebox.showinfo(
-
             "Success",
-
             "Account Created"
-
         )
 
     else:
 
         messagebox.showerror(
-
             "Error",
-
             "Username Already Exists"
-
         )
 
-login_button = Button(
-
+Button(
     login_window,
-
     text="Login",
-
     command=login,
+    width=20,
+    bg="#00c853",
+    fg="white"
+).pack(pady=20)
 
-    width=20
-
-)
-
-button_style(
-
-    login_button,
-
-    "#00c853"
-
-)
-
-login_button.pack(pady=20)
-
-register_button = Button(
-
+Button(
     login_window,
-
     text="Register",
-
     command=register,
+    width=20,
+    bg="#2962ff",
+    fg="white"
+).pack()
 
-    width=20
+# =========================
+# START
+# =========================
+
+update_clock()
+
+status_bar = Label(
+
+    window,
+
+    text="CYBER VAULT v23.0 ACTIVE",
+
+    bg="#001233",
+
+    fg="#00ffcc",
+
+    font=("Consolas", 11)
 
 )
 
-button_style(
+status_bar.pack(
 
-    register_button,
+    side=BOTTOM,
 
-    "#2962ff"
-
+    fill=X
 )
 
-register_button.pack(pady=10)
-
-login_window.mainloop()
-
+window.mainloop()
